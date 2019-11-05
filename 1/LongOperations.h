@@ -36,7 +36,7 @@ private:
 	/*HELPERS*/
 	void _modN(BigNumber N_);
 	void _normalizationZero();
-	
+
 public:
 
 	/*OPERATIONS*/
@@ -50,6 +50,8 @@ public:
 	void modN(string n);
 
 	/*GETTERS SETTERS*/
+	void printBigNumber();
+
 	void setBigNumber(BigNumber num) {
 		this->chunks = num.getChunks();
 		this->sign = num.getSign();
@@ -64,19 +66,18 @@ public:
 	void setChunks(vector<int> chunks) {
 		this->chunks = chunks;
 	};
-	int getBASE()	{ return this->BASE;}
-	string getN()		{return this->N;}
-	int getSign()	{ return this->sign;}
-	vector<int> getChunks() {	return this->chunks;}
-	
-	void printBigNumber();
+
+	int getBASE() { return this->BASE; }
+	string getN() { return this->N; }
+	int getSign() { return this->sign; }
+	vector<int> getChunks() { return this->chunks; }
 
 	/*CREATION*/
 	BigNumber(string str, string n) {
 		for (int i = 0; i < n.size(); i++) {
 			this->N.push_back(n[i]);
 		}
-		
+
 		int i;
 		for (i = str.size() - 1; i > 0; i--) {
 			chunks.push_back((str[i]) - '0');
@@ -94,12 +95,15 @@ public:
 		modN(N);
 
 	}
+
 	BigNumber(string n) {
 		sign = 1;
 		for (int i = 0; i < n.size(); i++) {
-			this->N.push_back(n[i]);
+			this->chunks.push_back(n[i]);
 		}
+		this->N.push_back('0');
 	}
+
 	~BigNumber() {}
 };
 
@@ -157,23 +161,23 @@ void  BigNumber::modN(string N) {
 
 	if (this->N == "0") { return; }
 	else {
-		
+
 		BigNumber N_(N, "0");
 		BigNumber temp("0");
-		temp.pushC(chunks[this->chunks.size()-1]);
-		for (int i = this->chunks.size()-2; i >= 0; i--) {
-		
-			if (temp >= N_){
+		temp.pushC(chunks[this->chunks.size() - 1]);
+		for (int i = this->chunks.size() - 2; i >= 0; i--) {
+
+			if (temp >= N_) {
 				temp._modN(N_);
 			}
-			
+
 			temp._reverse();
-			temp.pushC(chunks[i]); 
+			temp.pushC(chunks[i]);
 			temp._reverse();
 			temp._normalizationZero();
 		}
-		if (temp >= N_) {temp._modN(N_);}
-		
+		if (temp >= N_) { temp._modN(N_); }
+
 		if (this->sign == -1) {
 			setBigNumber(N_ - (temp));
 		}
@@ -247,10 +251,10 @@ bool BigNumber::operator == (BigNumber &num) {
 
 // operator +
 BigNumber BigNumber::operator + (BigNumber &num) {
-	
+
 	BigNumber res(N);
 	vector<int> reschunks;
-	
+
 	if (this->chunks.size() > num.chunks.size()) {
 		num._resize(this->chunks.size());
 	}
@@ -280,7 +284,7 @@ BigNumber BigNumber::operator + (BigNumber &num) {
 		int over = 0;
 		this->sign *= -1;
 		if ((*this) >= num) {
-			
+
 			for (int i = 0; i < this->chunks.size(); i++) {
 				reschunks.push_back(this->chunks[i] - num.chunks[i]);
 				reschunks[i] += over;
@@ -289,7 +293,7 @@ BigNumber BigNumber::operator + (BigNumber &num) {
 			}
 		}
 		else {
-			
+
 			res.sign *= -1;
 			for (int i = 0; i < this->chunks.size(); i++) {
 				reschunks.push_back(num.chunks[i] - this->chunks[i]);
@@ -317,7 +321,7 @@ BigNumber BigNumber::operator - (BigNumber &num) {
 
 	BigNumber res(N);
 	vector<int> reschunks;
-	
+
 	if (this->chunks.size() > num.chunks.size()) {
 		num._resize(this->chunks.size());
 	}
@@ -345,7 +349,7 @@ BigNumber BigNumber::operator - (BigNumber &num) {
 	else {
 		res.sign = this->sign;
 		int over = 0;
-		
+
 		if ((*this) >= num) {
 			for (int i = 0; i < this->chunks.size(); i++) {
 				reschunks.push_back(this->chunks[i] - num.chunks[i]);
@@ -372,6 +376,6 @@ BigNumber BigNumber::operator - (BigNumber &num) {
 
 	num._normalizationZero();
 	_normalizationZero();
-	
+
 	return res;
 }
