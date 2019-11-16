@@ -1,17 +1,13 @@
 #include <iostream>
 #include "LongOperations.h"
-
-
-int main() {
-	int N = 20;
-	BigNumber n1("-2033", N);
+int main()
+{
+	BigNumber n1("10", "15");
 	n1.printBigNumber();
-
-	BigNumber n2("-20", N);
+	BigNumber n2("7", "15");
 	n2.printBigNumber();
-
-	BigNumber n3 = n1 - n2;
+	std::cout << std::endl;
+	BigNumber n3 = n1 / n2;
 	n3.printBigNumber();
-	cin.get();
-	return 0;
+
 }

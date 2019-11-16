@@ -1,23 +1,22 @@
 #pragma once
+#include <string>
 #include <iostream>
 #include <vector>
-#include <string>
-#include <cmath>
 
-using std::string;
-using std::vector;
-using std::cin;
 using std::cout;
 using std::endl;
+using std::vector;
+using std::string;
 
-//Деление для отрицательных чисел
+//division for negaive numb
 int my_div(int num, int diver) {
 	if ((num < 0) && (num % diver))
 		return num / diver - 1;
 	else
 		return num / diver;
 }
-//Взятие по модулю для отрицательных чисел
+
+//mod for negaive numb
 int my_mod(int num, int diver) {
 	if ((num < 0) && (num % diver))
 		return num % diver + diver;
@@ -25,48 +24,62 @@ int my_mod(int num, int diver) {
 		return num % diver;
 }
 
-//Класс "большое число", описывает способ хранения большого числа и
-//длинную арифметику
+/*class BigNumber*/
 class BigNumber {
 private:
 	/*VALUES*/
 	vector<int> chunks;
 	int sign;
-	int BASE = 10;
-	int N = 0;
+	const unsigned int BASE = 10;
+	string N;
 
 	/*HELPERS*/
-	BigNumber _plus(BigNumber &a);
-	BigNumber _minus(BigNumber &a);
-	BigNumber _simplemulti(BigNumber &num);	//TODO
-	BigNumber _multi(BigNumber &num);		//TODO
-
-	bool _greater();
-	void _modN();
-	void _normalizationSigns();
-	void _normalizationChunks();
-	void _resize(int newsize);
+	void _modN(BigNumber N_);
+	void _normalizationZero();
 
 public:
+
 	/*OPERATIONS*/
-	bool operator >= (BigNumber &num);
-	bool operator > (BigNumber &num);
-	BigNumber operator + (BigNumber &num);
-	BigNumber operator - (BigNumber &num);
-	BigNumber operator * (BigNumber &num); //TODO
+	void operator = (const BigNumber &num);
+	bool operator == (const BigNumber &num) const;
+	bool operator >= (const BigNumber &num) const;
+	bool operator > (const BigNumber &num) const;
+	BigNumber operator + (const BigNumber &num) const;
+	BigNumber operator - (const BigNumber &num) const;
+	BigNumber operator * (const BigNumber &num) const;
+	BigNumber inverse() const;
+	BigNumber operator/(const BigNumber & num) const;
+	void _reverse();
+	void _resize(int newsize);
+	void modN(string n);
 
 	/*GETTERS SETTERS*/
-	int getBASE() {
-		return this->BASE;
-	}
-	int getN() {
-		return this->N;
-	}
 	void printBigNumber();
 
-	//Конструктор
-	BigNumber(string str, int n) {
-		this->N = n;
+	void setBigNumber(BigNumber num) {
+		this->chunks = num.getChunks();
+		this->sign = num.getSign();
+		N = num.getN();
+	}
+	void pushC(int a) {
+		this->chunks.push_back(a);
+	}
+	void setChunks(vector<int> chunks) {
+		this->chunks = chunks;
+	};
+	void setN(string N) {
+		this->N = N;
+		modN(N);
+	};
+
+	int getBASE() { return this->BASE; }
+	string getN() { return this->N; }
+	int getSign() { return this->sign; }
+	vector<int> getChunks() { return this->chunks; }
+
+	/*CREATION*/
+	BigNumber(string str, string n) {
+		N = n;
 		int i;
 		for (i = str.size() - 1; i > 0; i--) {
 			chunks.push_back((str[i]) - '0');
@@ -80,111 +93,37 @@ public:
 			sign = 1;
 			chunks.push_back((str[i]) - '0');
 		}
-
-		_modN();
-
+		modN(N);
 	}
-	BigNumber(int N) {
+
+	BigNumber(string n) {
 		sign = 1;
-		this->N = N;
+		for (int i = 0; i < n.size(); i++) {
+			this->chunks.push_back(n[i]);
+		}
+		this->N.push_back('0');
 	}
+
+	~BigNumber() {}
 };
 
-//Изменение размера массива с чанками
+// resize vector
 void BigNumber::_resize(int newSize) {
 	chunks.resize(newSize);
 }
 
-void BigNumber::printBigNumber() {
-	if (sign == -1) {
-		cout << '-';
+// reverse vector
+void BigNumber::_reverse() {
+	vector<int>::iterator first = begin(chunks);
+	vector<int>::iterator last = end(chunks);
+	while ((first != last) && (first != --last)) {
+		std::swap(*first++, *last);
 	}
-	for (int i = chunks.size() - 1; i >= 0; i--) {
-		cout << chunks[i];
-	}
-	cout << endl;
 }
 
-//Оператор >, 
+//  delete extra 0
+void BigNumber::_normalizationZero() {
 
-bool BigNumber::operator > (BigNumber &num) {
-	if (sign > num.sign) {
-		return true;
-	}
-	if (sign < num.sign) {
-		return false;
-	}
-	if (this->chunks.size() > num.chunks.size()) {
-		if (sign == 1) return true;
-		else return false;
-	}
-	if (this->chunks.size() < num.chunks.size()) {
-		if (sign == 1) return false;
-		else return true;
-	}
-
-	for (int i = 0; i < this->chunks.size(); i++) {
-		if (this->chunks[i] > num.chunks[i]) return true;
-		if (this->chunks[i] < num.chunks[i]) return false;
-	}
-
-	return false;
-}
-
-bool BigNumber::operator >= (BigNumber &num) {
-	if (sign > num.sign) {
-		return true;
-	}
-	if (sign < num.sign) {
-		return false;
-	}
-	if (this->chunks.size() > num.chunks.size()) {
-		if (sign == 1) return true;
-		else return false;
-	}
-	if (this->chunks.size() < num.chunks.size()) {
-		if (sign == 1) return false;
-		else return true;
-	}
-
-	for (int i = 0; i < this->chunks.size(); i++) {
-		if (this->chunks[i] > num.chunks[i]) return true;
-		if (this->chunks[i] < num.chunks[i]) return false;
-	}
-
-	return true;
-}
-
-void BigNumber::_normalizationChunks() {
-	int over = 0;
-	for (int i = 0; i < chunks.size() - 1; i++) {
-		chunks[i] += over;
-		over = my_div(chunks[i], BASE);
-		chunks[i] = my_mod(chunks[i], BASE);
-	}
-
-	chunks[chunks.size() - 1] += over;
-	if (chunks[chunks.size() - 1] / BASE) {
-		over = my_div(chunks[chunks.size() - 1], BASE);
-		chunks[chunks.size() - 1] = my_mod(chunks[chunks.size() - 1], BASE);
-		chunks.push_back(over);
-	}
-	return;
-}
-
-void BigNumber::_normalizationSigns() {
-
-	//Если в последней чанке отрицательное число
-	if (chunks[chunks.size() - 1] < 0) {
-		sign = -sign;
-
-		chunks[0] = BASE - chunks[0];
-		for (int i = 1; i < chunks.size(); i++) {
-			chunks[i] = (BASE - chunks[i] - 1) % BASE;
-		}
-	}
-
-	//Убираем из числа нулевые чанки
 	int i = chunks.size() - 1;
 	while (chunks[i] == 0) {
 		if (i == 0) {
@@ -197,148 +136,315 @@ void BigNumber::_normalizationSigns() {
 	return;
 }
 
+// print BigNumber
+void BigNumber::printBigNumber() {
+	if (sign == -1) {
+		cout << '-';
+	}
+	for (int i = chunks.size() - 1; i >= 0; i--) {
+		cout << chunks[i];
+	}
+	cout << endl;
+}
 
-void  BigNumber::_modN() {
-	if (N != 0) { //выравнивание по модулю
-		BigNumber N_(std::to_string(N), 0);
-		if (sign == 1) {
-			while (*this >= N_) {
-				*this = *this - N_;
+//* mod N
+void  BigNumber::_modN(BigNumber N_) {
+	BigNumber temp = (*this);
+	while (temp >= N_) {
+		temp.setBigNumber(temp - N_);
+	}
+	setBigNumber(temp);
+}
+//*/
+//* mod N
+void  BigNumber::modN(string N) {
+
+	if (this->N == "0") { return; }
+	else {
+
+		BigNumber N_(N, "0");
+		BigNumber temp("");
+		temp.pushC(chunks[this->chunks.size() - 1]);
+		for (int i = this->chunks.size() - 2; i >= 0; i--) {
+
+			if (temp >= N_) {
+				temp._modN(N_);
+			}
+
+			temp._reverse();
+			temp.pushC(chunks[i]);
+			temp._reverse();
+			temp._normalizationZero();
+		}
+		if (temp >= N_) { temp._modN(N_); }
+
+		if (this->sign == -1) {
+			setBigNumber(N_ - (temp));
+		}
+		else {
+			setBigNumber(temp);
+		}
+	}
+	this->N = N;
+}
+//*/
+
+// operator > 
+bool BigNumber::operator > (const BigNumber &num) const {
+	if (sign > num.sign) {
+		return true;
+	}
+	if (sign < num.sign) {
+		return false;
+	}
+	if (this->chunks.size() > num.chunks.size()) {
+		if (sign == 1) return true;
+		else return false;
+	}
+	if (this->chunks.size() < num.chunks.size()) {
+		if (sign == 1) return false;
+		else return true;
+	}
+
+	for (int i = this->chunks.size() - 1; i >= 0; i--) {
+		if (this->chunks[i] > num.chunks[i]) return true;
+		if (this->chunks[i] < num.chunks[i]) return false;
+	}
+
+	return false;
+}
+
+// operator >=
+bool BigNumber::operator >= (const BigNumber &num) const {
+	if (sign > num.sign) {
+		return true;
+	}
+	if (sign < num.sign) {
+		return false;
+	}
+	if (this->chunks.size() > num.chunks.size()) {
+		if (sign == 1) return true;
+		else return false;
+	}
+	if (this->chunks.size() < num.chunks.size()) {
+		if (sign == 1) return false;
+		else return true;
+	}
+
+	for (int i = this->chunks.size() - 1; i >= 0; i--) {
+		if (this->chunks[i] > num.chunks[i]) return true;
+		if (this->chunks[i] < num.chunks[i]) return false;
+	}
+
+	return true;
+}
+
+void BigNumber::operator =(const BigNumber &num)
+{
+	this->setBigNumber(num);
+}
+
+// operator ==
+bool BigNumber::operator == (const BigNumber &num) const {
+	if ((sign != num.sign) || (this->chunks.size() != num.chunks.size())) {
+		return false;
+	}
+	for (int i = 0; i < this->chunks.size(); i++) {
+		if (this->chunks[i] != num.chunks[i]) return false;
+	}
+	return true;
+}
+
+// operator +
+BigNumber BigNumber::operator + (const BigNumber &num) const {
+
+	BigNumber res("0", N);
+	vector<int> reschunks;
+	//a+b
+	BigNumber a = *this;
+	BigNumber b = num;
+	if (a.chunks.size() > b.chunks.size()) {
+		b._resize(a.chunks.size());
+	}
+	else {
+		a._resize(b.chunks.size());
+	}
+
+	if (sign == b.sign) {
+
+		res.sign = a.sign;
+
+		int over = 0;
+		for (int i = 0; i < a.chunks.size(); i++) {
+			reschunks.push_back(a.chunks[i] + b.chunks[i]);
+			reschunks[i] += over;
+			over = my_div(reschunks[i], BASE);
+			reschunks[i] = my_mod(reschunks[i], BASE);
+		}
+
+		if (over != 0) {
+			reschunks.push_back(over);
+		}
+
+	}
+	else {
+		res.sign = a.sign;
+		int over = 0;
+		a.sign *= -1;
+		if (a >= b) {
+
+			for (int i = 0; i < a.chunks.size(); i++) {
+				reschunks.push_back(a.chunks[i] - b.chunks[i]);
+				reschunks[i] += over;
+				over = my_div(reschunks[i], BASE);
+				reschunks[i] = my_mod(reschunks[i], BASE);
 			}
 		}
 		else {
-			BigNumber Nul("0", 0);
-			while (Nul > *this) {
-				*this = *this + N_;
+
+			res.sign *= -1;
+			for (int i = 0; i < a.chunks.size(); i++) {
+				reschunks.push_back(b.chunks[i] - a.chunks[i]);
+				reschunks[i] += over;
+				over = my_div(reschunks[i], BASE);
+				reschunks[i] = my_mod(reschunks[i], BASE);
 			}
 		}
+		a.sign *= -1;
+
 	}
+
+	res.setChunks(reschunks);
+	res._normalizationZero();
+	res.modN(N);
+
+	return res;
 }
-//Функция сложения
-BigNumber BigNumber::_plus(BigNumber &num) {
-	BigNumber res(N);
-	res.sign = this->sign;
+
+// operator -
+BigNumber BigNumber::operator - (const BigNumber &num) const {
+
+	BigNumber res("0",N);
+	vector<int> reschunks;
+	//a-b
+	BigNumber a = *this;
+	BigNumber b = num;
+	if (a.chunks.size() > b.chunks.size()) {
+		b._resize(a.chunks.size());
+	}
+	else {
+		a._resize(b.chunks.size());
+	}
+
+	if (sign != b.sign) {
+
+		res.sign = a.sign;
+
+		int over = 0;
+		for (int i = 0; i < a.chunks.size(); i++) {
+			reschunks.push_back(a.chunks[i] + b.chunks[i]);
+			reschunks[i] += over;
+			over = my_div(reschunks[i], BASE);
+			reschunks[i] = my_mod(reschunks[i], BASE);
+		}
+
+		if (over != 0) {
+			reschunks.push_back(over);
+		}
+
+	}
+	else {
+		res.sign = a.sign;
+		int over = 0;
+
+		if (a >= b) {
+			for (int i = 0; i < a.chunks.size(); i++) {
+				reschunks.push_back(a.chunks[i] - b.chunks[i]);
+				reschunks[i] += over;
+				over = my_div(reschunks[i], BASE);
+				reschunks[i] = my_mod(reschunks[i], BASE);
+			}
+		}
+		else {
+			res.sign *= -1;
+			for (int i = 0; i < a.chunks.size(); i++) {
+				reschunks.push_back(b.chunks[i] - a.chunks[i]);
+				reschunks[i] += over;
+				over = my_div(reschunks[i], BASE);
+				reschunks[i] = my_mod(reschunks[i], BASE);
+			}
+		}
+
+	}
+
+	res.setChunks(reschunks);
+	res._normalizationZero();
+	res.modN(N);
+
+	return res;
+}
+
+
+// operator *
+BigNumber BigNumber::operator * (const BigNumber &num) const {
+
+	BigNumber res("0",N);
+	vector<int> res_chunks;
+	res_chunks.resize(this->chunks.size() + num.chunks.size()+1);
 	for (int i = 0; i < this->chunks.size(); i++) {
-		res.chunks.push_back(this->sign*this->chunks[i] + num.sign* num.chunks[i]);
+		for (int j = 0; j < num.chunks.size(); j++) {
+			res_chunks[i + j] += this->chunks[i] * num.chunks[j];
+			res_chunks[i + j] = res_chunks[i + j] % 10;
+			res_chunks[i + j+1] += res_chunks[i + j] / 10;
+		}
 	}
+	res.setChunks(res_chunks);
+	res._normalizationZero();
+	res.modN(res.getN());
+	
 	return res;
 }
-
-//Функция вычитания
-BigNumber BigNumber::_minus(BigNumber &num) {
-	BigNumber res(N);
-	res.sign = this->sign;
-	for (int i = 0; i < this->chunks.size(); i++) {
-		res.chunks.push_back(this->chunks[i] - num.chunks[i]);
+//returns 0 if greatest common dividor !=1
+BigNumber BigNumber::inverse() const {
+	BigNumber a = *this;
+	BigNumber b (N,"0");
+	BigNumber one("1", N);
+	BigNumber zero("0", N);
+	BigNumber a_1("1", N);//a count in a
+	BigNumber a_2("0", N);//b count in a
+	BigNumber b_1("0", N);//a count in b
+	BigNumber b_2("1", N);//b count in b
+	BigNumber x("0", N);//result
+	while (!(a==one) && !(b==one)) {
+		if ((a == zero) || (b == zero)) {
+			return zero;
+		}
+		if (a >= b) {
+			a = a - b;
+			a_1 = a_1 - b_1;
+			a_2 = a_2 - b_2;
+		}
+		else
+		{
+			b = b - a;
+			b_1 = b_1 - a_1;
+			b_2 = b_2 - a_2;
+		}
 	}
-	return res;
+	if (a == one) {
+		x = a_1;
+	}
+	else {
+		x = b_1;
+	}
+	x.setN(N);
+	return x;
 }
 
-//Оператор +, выполняет корректное сложение больших чисел
-BigNumber BigNumber::operator + (BigNumber &num) {
-	BigNumber res(N);
+// operator /
+BigNumber BigNumber::operator / (const BigNumber &num) const {
 
-	//Приводим размер чанок обоих чисел
-	if (this->chunks.size() > num.chunks.size()) {
-		num._resize(chunks.size());
-	}
-	else {
-		(*this)._resize(num.chunks.size());
-	}
-
-	//Выполняем операцию в зависимости от знаков чисел
-	if (sign == num.sign) {
-		res = (*this)._plus(num);
-	}
-	else {
-		res = (*this)._minus(num);
-	}
-
-	//Нормализуем результат
-	res._normalizationChunks();
-	res._normalizationSigns();
-	res._modN();
-
-	return res;
-}
-
-
-//Оператор -, выполняет корректное вычитание
-BigNumber BigNumber::operator - (BigNumber &num) {
-	BigNumber res(N);
-	//Приводим размер чанок
-	if (this->chunks.size() > num.chunks.size()) {
-		num._resize(chunks.size());
-	}
-	else {
-		(*this)._resize(num.chunks.size());
-	}
-	//В зависимости от знаков, выполняем нужное действие
-	if (sign != num.sign) {
-		res = (*this)._plus(num);
-	}
-	else {
-		res = (*this)._minus(num);
-	}
-	//Нормализуем результат
-	res._normalizationChunks();
-	res._normalizationSigns();
-	res._modN();
+	BigNumber res = (*this)*(num.inverse());
 
 	return res;
 }
-
-
-
-
-///***********часть Антона***************/
-////Функция умножения больших чисел
-//BigNumber BigNumber::_simplemulti(BigNumber &num) {
-//	BigNumber result;
-//
-//	result._resize(2 * this->chunks.size());
-//	result.sign = this->sign;
-//
-//	for (int i = 0; i < this->chunks.size(); i++) {
-//		for (int j = 0; j < num.chunks.size(); j++) {
-//			result.chunks[i + j] += this->chunks[i] * num.chunks[j];
-//		}
-//	}
-//
-//	result._normalizationChunks();
-//	return result;
-//}
-//
-////Функция приводит большие числа к нужному размеру
-//BigNumber BigNumber::_multi(BigNumber &num) {
-//	auto maxSize = max(this->chunks.size(), num.chunks.size());
-//
-//	int newSize = 1;
-//	while (newSize < maxSize) {
-//		newSize *= 2;
-//	}
-//
-//	(*this)._resize(newSize);
-//	num._resize(newSize);
-//
-//	//return (*this)._fastmulti(num);
-//	return (*this)._simplemulti(num);
-//}
-//
-//BigNumber BigNumber::operator * (BigNumber &num) {
-//	BigNumber result;
-//
-//	result = (*this)._multi(num);
-//	result._normalizationChunks();
-//
-//	if (this->sign == num.sign) {
-//		result.sign = 1;
-//	}
-//	else {
-//		result.sign = -1;
-//	}
-//
-//	return result;
-//}
-//
-///**********************/
