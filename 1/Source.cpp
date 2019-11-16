@@ -1,22 +1,13 @@
 #include <iostream>
 #include "LongOperations.h"
-using namespace std;
 
-int main() {
-
-	string N = "1000000000";
-	BigNumber n1("123456789", N);
+int main()
+{
+	BigNumber n1("10", "15");
 	n1.printBigNumber();
-
-	BigNumber n2("987654321", N);
+	BigNumber n2("7", "15");
 	n2.printBigNumber();
-	
-	BigNumber n3 = n1 - n2;
+	std::cout << std::endl;
+	BigNumber n3 = n1 / n2;
 	n3.printBigNumber();
-
-	n3.setBigNumber(n2 + n1);
-	n3.printBigNumber();
-	
-	cin.get();
-	return 0;
 }

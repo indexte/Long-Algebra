@@ -40,11 +40,16 @@ private:
 public:
 
 	/*OPERATIONS*/
-	bool operator == (BigNumber &num);
-	bool operator >= (BigNumber &num);
-	bool operator > (BigNumber &num);
-	BigNumber operator + (BigNumber &num);
-	BigNumber operator - (BigNumber &num);
+
+	void operator = (const BigNumber &num);
+	bool operator == (const BigNumber &num) const;
+	bool operator >= (const BigNumber &num) const;
+	bool operator > (const BigNumber &num) const;
+	BigNumber operator + (const BigNumber &num) const;
+	BigNumber operator - (const BigNumber &num) const;
+	BigNumber operator * (const BigNumber &num) const;
+	BigNumber inverse() const;
+	BigNumber operator/(const BigNumber & num) const;
 	void _reverse();
 	void _resize(int newsize);
 	void modN(string n);
@@ -66,18 +71,23 @@ public:
 	void setChunks(vector<int> chunks) {
 		this->chunks = chunks;
 	};
+	void setN(string N) {
+		this->N = N;
+		modN(N);
+	};
+
 
 	int getBASE() { return this->BASE; }
 	string getN() { return this->N; }
 	int getSign() { return this->sign; }
 	vector<int> getChunks() { return this->chunks; }
 
+
 	/*CREATION*/
 	BigNumber(string str, string n) {
 		for (int i = 0; i < n.size(); i++) {
 			this->N.push_back(n[i]);
 		}
-
 		int i;
 		for (i = str.size() - 1; i > 0; i--) {
 			chunks.push_back((str[i]) - '0');
@@ -91,9 +101,7 @@ public:
 			sign = 1;
 			chunks.push_back((str[i]) - '0');
 		}
-
 		modN(N);
-
 	}
 
 	BigNumber(string n) {
@@ -163,7 +171,7 @@ void  BigNumber::modN(string N) {
 	else {
 
 		BigNumber N_(N, "0");
-		BigNumber temp("0");
+		BigNumber temp("");
 		temp.pushC(chunks[this->chunks.size() - 1]);
 		for (int i = this->chunks.size() - 2; i >= 0; i--) {
 
@@ -185,11 +193,13 @@ void  BigNumber::modN(string N) {
 			setBigNumber(temp);
 		}
 	}
+	this->N = N;
 }
 //*/
 
 // operator > 
-bool BigNumber::operator > (BigNumber &num) {
+bool BigNumber::operator > (const BigNumber &num) const {
+
 	if (sign > num.sign) {
 		return true;
 	}
@@ -214,7 +224,8 @@ bool BigNumber::operator > (BigNumber &num) {
 }
 
 // operator >=
-bool BigNumber::operator >= (BigNumber &num) {
+bool BigNumber::operator >= (const BigNumber &num) const {
+
 	if (sign > num.sign) {
 		return true;
 	}
@@ -238,8 +249,14 @@ bool BigNumber::operator >= (BigNumber &num) {
 	return true;
 }
 
+
+void BigNumber::operator =(const BigNumber &num)
+{
+	this->setBigNumber(num);
+}
+
 // operator ==
-bool BigNumber::operator == (BigNumber &num) {
+bool BigNumber::operator == (const BigNumber &num) const {
 	if ((sign != num.sign) || (this->chunks.size() != num.chunks.size())) {
 		return false;
 	}
@@ -250,25 +267,28 @@ bool BigNumber::operator == (BigNumber &num) {
 }
 
 // operator +
-BigNumber BigNumber::operator + (BigNumber &num) {
+BigNumber BigNumber::operator + (const BigNumber &num) const {
 
-	BigNumber res(N);
+	BigNumber res("0", N);
 	vector<int> reschunks;
-
-	if (this->chunks.size() > num.chunks.size()) {
-		num._resize(this->chunks.size());
+	//a+b
+	BigNumber a = *this;
+	BigNumber b = num;
+	if (a.chunks.size() > b.chunks.size()) {
+		b._resize(a.chunks.size());
 	}
 	else {
-		_resize(num.chunks.size());
+		a._resize(b.chunks.size());
 	}
 
-	if (sign == num.sign) {
+	if (sign == b.sign) {
 
-		res.sign = this->sign;
+		res.sign = a.sign;
 
 		int over = 0;
-		for (int i = 0; i < this->chunks.size(); i++) {
-			reschunks.push_back(this->chunks[i] + num.chunks[i]);
+		for (int i = 0; i < a.chunks.size(); i++) {
+			reschunks.push_back(a.chunks[i] + b.chunks[i]);
+
 			reschunks[i] += over;
 			over = my_div(reschunks[i], BASE);
 			reschunks[i] = my_mod(reschunks[i], BASE);
@@ -280,13 +300,14 @@ BigNumber BigNumber::operator + (BigNumber &num) {
 
 	}
 	else {
-		res.sign = this->sign;
+		res.sign = a.sign;
 		int over = 0;
-		this->sign *= -1;
-		if ((*this) >= num) {
+		a.sign *= -1;
+		if (a >= b) {
 
-			for (int i = 0; i < this->chunks.size(); i++) {
-				reschunks.push_back(this->chunks[i] - num.chunks[i]);
+			for (int i = 0; i < a.chunks.size(); i++) {
+				reschunks.push_back(a.chunks[i] - b.chunks[i]);
+
 				reschunks[i] += over;
 				over = my_div(reschunks[i], BASE);
 				reschunks[i] = my_mod(reschunks[i], BASE);
@@ -295,43 +316,83 @@ BigNumber BigNumber::operator + (BigNumber &num) {
 		else {
 
 			res.sign *= -1;
-			for (int i = 0; i < this->chunks.size(); i++) {
-				reschunks.push_back(num.chunks[i] - this->chunks[i]);
+
+			for (int i = 0; i < a.chunks.size(); i++) {
+				reschunks.push_back(b.chunks[i] - a.chunks[i]);
 				reschunks[i] += over;
 				over = my_div(reschunks[i], BASE);
 				reschunks[i] = my_mod(reschunks[i], BASE);
 			}
 		}
-		this->sign *= -1;
-
+		a.sign *= -1;
 	}
 
 	res.setChunks(reschunks);
 	res._normalizationZero();
 	res.modN(N);
-
-	num._normalizationZero();
-	_normalizationZero();
-
 	return res;
 }
 
 // operator -
-BigNumber BigNumber::operator - (BigNumber &num) {
 
-	BigNumber res(N);
+BigNumber BigNumber::operator - (const BigNumber &num) const {
+
+	BigNumber res("0",N);
 	vector<int> reschunks;
-
-	if (this->chunks.size() > num.chunks.size()) {
-		num._resize(this->chunks.size());
+	//a-b
+	BigNumber a = *this;
+	BigNumber b = num;
+	if (a.chunks.size() > b.chunks.size()) {
+		b._resize(a.chunks.size());
 	}
 	else {
-		_resize(num.chunks.size());
+		a._resize(b.chunks.size());
 	}
 
-	if (sign != num.sign) {
+	if (sign != b.sign) {
 
-		res.sign = this->sign;
+		res.sign = a.sign;
+
+		int over = 0;
+		for (int i = 0; i < a.chunks.size(); i++) {
+			reschunks.push_back(a.chunks[i] + b.chunks[i]);
+			reschunks[i] += over;
+			over = my_div(reschunks[i], BASE);
+			reschunks[i] = my_mod(reschunks[i], BASE);
+		}
+
+		if (over != 0) {
+			reschunks.push_back(over);
+		}
+
+	}
+	else {
+		res.sign = a.sign;
+		int over = 0;
+
+		if (a >= b) {
+			for (int i = 0; i < a.chunks.size(); i++) {
+				reschunks.push_back(a.chunks[i] - b.chunks[i]);
+				reschunks[i] += over;
+				over = my_div(reschunks[i], BASE);
+				reschunks[i] = my_mod(reschunks[i], BASE);
+			}
+		}
+		else {
+			res.sign *= -1;
+			for (int i = 0; i < a.chunks.size(); i++) {
+				reschunks.push_back(b.chunks[i] - a.chunks[i]);
+				reschunks[i] += over;
+				over = my_div(reschunks[i], BASE);
+				reschunks[i] = my_mod(reschunks[i], BASE);
+			}
+		}
+
+	}
+
+	res.setChunks(reschunks);
+	res._normalizationZero();
+	res.modN(N);
 
 		int over = 0;
 		for (int i = 0; i < this->chunks.size(); i++) {
@@ -345,37 +406,68 @@ BigNumber BigNumber::operator - (BigNumber &num) {
 			reschunks.push_back(over);
 		}
 
+
+// operator *
+BigNumber BigNumber::operator * (const BigNumber &num) const {
+
+	BigNumber res("0",N);
+	vector<int> res_chunks;
+	res_chunks.resize(this->chunks.size() + num.chunks.size()+1);
+	for (int i = 0; i < this->chunks.size(); i++) {
+		for (int j = 0; j < num.chunks.size(); j++) {
+			res_chunks[i + j] += this->chunks[i] * num.chunks[j];
+			res_chunks[i + j] = res_chunks[i + j] % 10;
+			res_chunks[i + j+1] += res_chunks[i + j] / 10;
+		}
+	}
+	res.setChunks(res_chunks);
+	res._normalizationZero();
+	res.modN(res.getN());
+	
+	return res;
+}
+//returns 0 if greatest common dividor !=1
+BigNumber BigNumber::inverse() const {
+	BigNumber a = *this;
+	BigNumber b (N,"0");
+	BigNumber one("1", N);
+	BigNumber zero("0", N);
+	BigNumber a_1("1", N);//a count in a
+	BigNumber a_2("0", N);//b count in a
+	BigNumber b_1("0", N);//a count in b
+	BigNumber b_2("1", N);//b count in b
+	BigNumber x("0", N);//result
+	while (!(a==one) && !(b==one)) {
+		if ((a == zero) || (b == zero)) {
+			return zero;
+		}
+		if (a >= b) {
+			a = a - b;
+			a_1 = a_1 - b_1;
+			a_2 = a_2 - b_2;
+		}
+		else
+		{
+			b = b - a;
+			b_1 = b_1 - a_1;
+			b_2 = b_2 - a_2;
+		}
+	}
+	if (a == one) {
+		x = a_1;
 	}
 	else {
-		res.sign = this->sign;
-		int over = 0;
-
-		if ((*this) >= num) {
-			for (int i = 0; i < this->chunks.size(); i++) {
-				reschunks.push_back(this->chunks[i] - num.chunks[i]);
-				reschunks[i] += over;
-				over = my_div(reschunks[i], BASE);
-				reschunks[i] = my_mod(reschunks[i], BASE);
-			}
-		}
-		else {
-			res.sign *= -1;
-			for (int i = 0; i < this->chunks.size(); i++) {
-				reschunks.push_back(num.chunks[i] - this->chunks[i]);
-				reschunks[i] += over;
-				over = my_div(reschunks[i], BASE);
-				reschunks[i] = my_mod(reschunks[i], BASE);
-			}
-		}
-
+		x = b_1;
 	}
+	x.setN(N);
+	return x;
+}
 
-	res.setChunks(reschunks);
-	res._normalizationZero();
-	res.modN(N);
+// operator /
+BigNumber BigNumber::operator / (const BigNumber &num) const {
 
-	num._normalizationZero();
-	_normalizationZero();
+	BigNumber res = (*this)*(num.inverse());
+
 
 	return res;
 }
