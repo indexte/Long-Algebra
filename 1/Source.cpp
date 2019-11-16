@@ -1,5 +1,6 @@
 #include <iostream>
 #include "LongOperations.h"
+
 int main()
 {
 	BigNumber n1("10", "15");
@@ -9,5 +10,4 @@ int main()
 	std::cout << std::endl;
 	BigNumber n3 = n1 / n2;
 	n3.printBigNumber();
-
 }
