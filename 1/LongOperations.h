@@ -61,7 +61,10 @@ public:
 	void setBigNumber(BigNumber num) {
 		this->chunks = num.getChunks();
 		this->sign = num.getSign();
-		N = num.getN();
+		string n = num.getN();
+		for (int i = 0; i < n.size(); i++) {
+			this->N.push_back(n[i]);
+		}
 	}
 	void pushC(int a) {
 		this->chunks.push_back(a);
@@ -74,14 +77,18 @@ public:
 		modN(N);
 	};
 
+
 	int getBASE() { return this->BASE; }
 	string getN() { return this->N; }
 	int getSign() { return this->sign; }
 	vector<int> getChunks() { return this->chunks; }
 
+
 	/*CREATION*/
 	BigNumber(string str, string n) {
-		N = n;
+		for (int i = 0; i < n.size(); i++) {
+			this->N.push_back(n[i]);
+		}
 		int i;
 		for (i = str.size() - 1; i > 0; i--) {
 			chunks.push_back((str[i]) - '0');
@@ -193,6 +200,7 @@ void  BigNumber::modN(string N) {
 
 // operator > 
 bool BigNumber::operator > (const BigNumber &num) const {
+
 	if (sign > num.sign) {
 		return true;
 	}
@@ -218,6 +226,7 @@ bool BigNumber::operator > (const BigNumber &num) const {
 
 // operator >=
 bool BigNumber::operator >= (const BigNumber &num) const {
+
 	if (sign > num.sign) {
 		return true;
 	}
@@ -286,6 +295,7 @@ BigNumber BigNumber::operator + (const BigNumber &num) const {
 		int over = 0;
 		for (int i = 0; i < a.chunks.size(); i++) {
 			reschunks.push_back(a.chunks[i] + b.chunks[i]);
+
 			reschunks[i] += over;
 			over = my_div(reschunks[i], BASE);
 			reschunks[i] = my_mod(reschunks[i], BASE);
@@ -304,6 +314,7 @@ BigNumber BigNumber::operator + (const BigNumber &num) const {
 
 			for (int i = 0; i < a.chunks.size(); i++) {
 				reschunks.push_back(a.chunks[i] - b.chunks[i]);
+
 				reschunks[i] += over;
 				over = my_div(reschunks[i], BASE);
 				reschunks[i] = my_mod(reschunks[i], BASE);
@@ -312,6 +323,7 @@ BigNumber BigNumber::operator + (const BigNumber &num) const {
 		else {
 
 			res.sign *= -1;
+
 			for (int i = 0; i < a.chunks.size(); i++) {
 				reschunks.push_back(b.chunks[i] - a.chunks[i]);
 				reschunks[i] += over;
@@ -320,17 +332,16 @@ BigNumber BigNumber::operator + (const BigNumber &num) const {
 			}
 		}
 		a.sign *= -1;
-
 	}
 
 	res.setChunks(reschunks);
 	res._normalizationZero();
 	res.modN(N);
-
 	return res;
 }
 
 // operator -
+
 BigNumber BigNumber::operator - (const BigNumber &num) const {
 
 	BigNumber res("0",N);
@@ -390,8 +401,17 @@ BigNumber BigNumber::operator - (const BigNumber &num) const {
 	res._normalizationZero();
 	res.modN(N);
 
-	return res;
-}
+		int over = 0;
+		for (int i = 0; i < this->chunks.size(); i++) {
+			reschunks.push_back(this->chunks[i] + num.chunks[i]);
+			reschunks[i] += over;
+			over = my_div(reschunks[i], BASE);
+			reschunks[i] = my_mod(reschunks[i], BASE);
+		}
+
+		if (over != 0) {
+			reschunks.push_back(over);
+		}
 
 
 // operator *
@@ -455,6 +475,7 @@ BigNumber BigNumber::inverse() const {
 BigNumber BigNumber::operator / (const BigNumber &num) const {
 
 	BigNumber res = (*this)*(num.inverse());
+
 
 	return res;
 }
