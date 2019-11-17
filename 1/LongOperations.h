@@ -40,7 +40,7 @@ private:
 public:
 
 	/*OPERATIONS*/
-	BigNumber operator - ();
+	BigNumber operator - () const;
 	void operator = (const BigNumber &num);
 	bool operator == (const BigNumber &num) const;
 	bool operator >= (const BigNumber &num) const;
@@ -241,11 +241,12 @@ bool BigNumber::operator >= (const BigNumber &num) const {
 	return true;
 }
 
-BigNumber BigNumber::operator-()
+BigNumber BigNumber::operator-() const
 {
-	sign *= -1;
-	modN(N);
-	return *this;
+	BigNumber res = *this;
+	res.sign *= -1;
+	res.modN(N);
+	return res;
 }
 
 void BigNumber::operator =(const BigNumber &num)
