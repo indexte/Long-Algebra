@@ -344,7 +344,7 @@ BigNumber BigNumber::operator + (const BigNumber &num) const {
 
 BigNumber BigNumber::operator - (const BigNumber &num) const {
 
-	BigNumber res("0",N);
+	BigNumber res("0", N);
 	vector<int> reschunks;
 	//a-b
 	BigNumber a = *this;
@@ -401,19 +401,19 @@ BigNumber BigNumber::operator - (const BigNumber &num) const {
 	res._normalizationZero();
 	res.modN(N);
 
-		int over = 0;
-		for (int i = 0; i < this->chunks.size(); i++) {
-			reschunks.push_back(this->chunks[i] + num.chunks[i]);
-			reschunks[i] += over;
-			over = my_div(reschunks[i], BASE);
-			reschunks[i] = my_mod(reschunks[i], BASE);
-		}
+	int over = 0;
+	for (int i = 0; i < this->chunks.size(); i++) {
+		reschunks.push_back(this->chunks[i] + num.chunks[i]);
+		reschunks[i] += over;
+		over = my_div(reschunks[i], BASE);
+		reschunks[i] = my_mod(reschunks[i], BASE);
+	}
 
-		if (over != 0) {
-			reschunks.push_back(over);
-		}
+	if (over != 0) {
+		reschunks.push_back(over);
+	}
 
-
+}
 // operator *
 BigNumber BigNumber::operator * (const BigNumber &num) const {
 
