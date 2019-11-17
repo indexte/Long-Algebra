@@ -40,7 +40,7 @@ private:
 public:
 
 	/*OPERATIONS*/
-
+	BigNumber operator - ();
 	void operator = (const BigNumber &num);
 	bool operator == (const BigNumber &num) const;
 	bool operator >= (const BigNumber &num) const;
@@ -50,6 +50,7 @@ public:
 	BigNumber operator * (const BigNumber &num) const;
 	BigNumber inverse() const;
 	BigNumber operator/(const BigNumber & num) const;
+	friend std::ostream & operator << (std::ostream &out, const BigNumber &num);
 	void _reverse();
 	void _resize(int newsize);
 	void modN(string n);
@@ -249,6 +250,12 @@ bool BigNumber::operator >= (const BigNumber &num) const {
 	return true;
 }
 
+BigNumber BigNumber::operator-()
+{
+	sign *= -1;
+	modN(N);
+	return *this;
+}
 
 void BigNumber::operator =(const BigNumber &num)
 {
@@ -337,7 +344,7 @@ BigNumber BigNumber::operator + (const BigNumber &num) const {
 
 BigNumber BigNumber::operator - (const BigNumber &num) const {
 
-	BigNumber res("0",N);
+	BigNumber res("0", N);
 	vector<int> reschunks;
 	//a-b
 	BigNumber a = *this;
@@ -394,19 +401,19 @@ BigNumber BigNumber::operator - (const BigNumber &num) const {
 	res._normalizationZero();
 	res.modN(N);
 
-		int over = 0;
-		for (int i = 0; i < this->chunks.size(); i++) {
-			reschunks.push_back(this->chunks[i] + num.chunks[i]);
-			reschunks[i] += over;
-			over = my_div(reschunks[i], BASE);
-			reschunks[i] = my_mod(reschunks[i], BASE);
-		}
+	int over = 0;
+	for (int i = 0; i < this->chunks.size(); i++) {
+		reschunks.push_back(this->chunks[i] + num.chunks[i]);
+		reschunks[i] += over;
+		over = my_div(reschunks[i], BASE);
+		reschunks[i] = my_mod(reschunks[i], BASE);
+	}
 
-		if (over != 0) {
-			reschunks.push_back(over);
-		}
+	if (over != 0) {
+		reschunks.push_back(over);
+	}
 
-
+}
 // operator *
 BigNumber BigNumber::operator * (const BigNumber &num) const {
 
@@ -416,11 +423,12 @@ BigNumber BigNumber::operator * (const BigNumber &num) const {
 	for (int i = 0; i < this->chunks.size(); i++) {
 		for (int j = 0; j < num.chunks.size(); j++) {
 			res_chunks[i + j] += this->chunks[i] * num.chunks[j];
-			res_chunks[i + j] = res_chunks[i + j] % 10;
-			res_chunks[i + j+1] += res_chunks[i + j] / 10;
+			res_chunks[i + j + 1] += res_chunks[i + j] / 10;
+			res_chunks[i + j] = res_chunks[i + j] % 10;			
 		}
 	}
 	res.setChunks(res_chunks);
+	res.printBigNumber();
 	res._normalizationZero();
 	res.modN(res.getN());
 	
@@ -470,4 +478,12 @@ BigNumber BigNumber::operator / (const BigNumber &num) const {
 
 
 	return res;
+}
+
+std::ostream & operator<<(std::ostream & out, const BigNumber & num)
+{
+	for (int i = num.chunks.size() - 1; i >= 0; i--) {
+		out << num.chunks[i];
+	}
+	return out;
 }
