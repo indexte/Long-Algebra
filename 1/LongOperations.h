@@ -50,6 +50,7 @@ public:
 	BigNumber operator * (const BigNumber &num) const;
 	BigNumber inverse() const;
 	BigNumber operator/(const BigNumber & num) const;
+	bool operator!=(const BigNumber & num) const;
 	friend std::ostream & operator << (std::ostream &out, const BigNumber &num);
 	void _reverse();
 	void _resize(int newsize);
@@ -409,7 +410,6 @@ BigNumber BigNumber::operator * (const BigNumber &num) const {
 		}
 	}
 	res.setChunks(res_chunks);
-	res.printBigNumber();
 	res._normalizationZero();
 	res.modN(res.getN());
 	
@@ -426,7 +426,7 @@ BigNumber BigNumber::inverse() const {
 	BigNumber b_1("0", N);//a count in b
 	BigNumber b_2("1", N);//b count in b
 	BigNumber x("0", N);//result
-	while (!(a==one) && !(b==one)) {
+	while (a!=one && b!=one) {
 		if ((a == zero) || (b == zero)) {
 			return zero;
 		}
@@ -466,4 +466,8 @@ std::ostream & operator<<(std::ostream & out, const BigNumber & num)
 		out << num.chunks[i];
 	}
 	return out;
+}
+
+bool BigNumber::operator != (const BigNumber &num) const {
+	return !(*this == num);
 }
