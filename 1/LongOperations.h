@@ -409,7 +409,6 @@ BigNumber BigNumber::operator * (const BigNumber &num) const {
 		}
 	}
 	res.setChunks(res_chunks);
-	res.printBigNumber();
 	res._normalizationZero();
 	res.modN(res.getN());
 	
