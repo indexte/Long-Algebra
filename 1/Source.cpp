@@ -1,5 +1,5 @@
 #include <iostream>
-#include "LongOperations.h"
+#include "BigNumber.h"
 
 int main()
 {
