@@ -45,12 +45,14 @@ public:
 	bool operator == (const BigNumber &num) const;
 	bool operator >= (const BigNumber &num) const;
 	bool operator > (const BigNumber &num) const;
+	BigNumber operator % (const BigNumber &num) const;
 	BigNumber operator + (const BigNumber &num) const;
 	BigNumber operator - (const BigNumber &num) const;
 	BigNumber operator * (const BigNumber &num) const;
 	BigNumber inverse() const;
 	BigNumber operator/(const BigNumber & num) const;
 	bool operator!=(const BigNumber & num) const;
+	string to_string()const;
 	friend std::ostream & operator << (std::ostream &out, const BigNumber &num);
 	void _reverse();
 	void _resize(int newsize);
@@ -470,4 +472,24 @@ std::ostream & operator<<(std::ostream & out, const BigNumber & num)
 
 bool BigNumber::operator != (const BigNumber &num) const {
 	return !(*this == num);
+}
+
+string BigNumber::to_string() const
+{
+	string res;
+	for (int i = chunks.size() - 1; i >= 0; i--) {
+		res.push_back(char(chunks[i] + int('0')));
+	}
+	return res;
+}
+
+
+BigNumber BigNumber::operator%(const BigNumber & num) const
+{
+	BigNumber res = BigNumber("0", N);
+	res.setChunks(chunks);
+	string _N = N;
+	res.setN(num.to_string());
+	res.setN(_N);
+	return res;
 }
