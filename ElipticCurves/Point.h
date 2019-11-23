@@ -1,21 +1,33 @@
 #pragma once
+#include "BigNumber.h"
 
 class Point {
 private:
-	long long x;
-	long long y;
+	BigNumber x;
+	BigNumber y;
+	bool isInfinite;
 public:
 
-	Point(long long x, long long y) :x(x), y(y) {
+	static Point getInfinitePoint() {
+		Point point = Point(BigNumber("0"), BigNumber("0"));
+		point.isInfinite = true;
+		return point;
+	}
+
+	Point(BigNumber x, BigNumber y) :x(x), y(y) {
 
 	}
 
-	long long getX() {
+	BigNumber getX() {
 		return x;
 	}
 
-	long long getY() {
+	BigNumber getY() {
 		return y;
+	}
+
+	bool isInfinitePoint() {
+		return isInfinite;
 	}
 
 	bool operator==(const Point& point) {
