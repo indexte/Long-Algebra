@@ -104,7 +104,7 @@ public:
 
 	BigNumber(string n) {
 		sign = 1;
-		for (int i = n.size(); i >=0 ; i--) {
+		for (int i = n.size()-1; i >=0 ; i--) {
 			this->chunks.push_back(n[i] - '0');
 		}
 		N = "0";
