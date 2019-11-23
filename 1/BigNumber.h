@@ -104,7 +104,7 @@ public:
 
 	BigNumber(string n) {
 		sign = 1;
-		for (int i = 0; i < n.size(); i++) {
+		for (int i = n.size(); i >=0 ; i--) {
 			this->chunks.push_back(n[i] - '0');
 		}
 		N = "0";
@@ -479,6 +479,7 @@ string BigNumber::to_string() const
 {
 	string res;
 	for (int i = chunks.size() - 1; i >= 0; i--) {
+		cout << char(chunks[i] + int('0')) << endl;
 		res.push_back(char(chunks[i] + int('0')));
 	}
 	return res;
