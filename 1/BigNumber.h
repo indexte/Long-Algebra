@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 #include <string>
 #include <iostream>
 #include <vector>
@@ -104,9 +105,9 @@ public:
 	BigNumber(string n) {
 		sign = 1;
 		for (int i = 0; i < n.size(); i++) {
-			this->chunks.push_back(n[i]);
+			this->chunks.push_back(n[i] - '0');
 		}
-		this->N.push_back('0');
+		N = "0";
 	}
 
 	~BigNumber() {}
