@@ -13,7 +13,7 @@ int main() {
 	Point b = Point(BigNumber("3", "23"), BigNumber("10", "23"));
 
 	//A=1,B=1,N=23
-	ElipticCurve curve = ElipticCurve(BigNumber("1","23"), BigNumber("1","23"), BigNumber("23"));
+	ElipticCurve curve = ElipticCurve(BigNumber("1","23"), BigNumber("1","23"), BigNumber("23","23"));
 
 	Point sumAB = curve.addPoints(a, b);
 
