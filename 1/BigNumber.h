@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 #include <string>
 #include <iostream>
 #include <vector>
@@ -45,12 +46,14 @@ public:
 	bool operator == (const BigNumber &num) const;
 	bool operator >= (const BigNumber &num) const;
 	bool operator > (const BigNumber &num) const;
+	BigNumber operator % (const BigNumber &num) const;
 	BigNumber operator + (const BigNumber &num) const;
 	BigNumber operator - (const BigNumber &num) const;
 	BigNumber operator * (const BigNumber &num) const;
 	BigNumber inverse() const;
 	BigNumber operator/(const BigNumber & num) const;
 	bool operator!=(const BigNumber & num) const;
+	string to_string()const;
 	friend std::ostream & operator << (std::ostream &out, const BigNumber &num);
 	void _reverse();
 	void _resize(int newsize);
@@ -101,10 +104,10 @@ public:
 
 	BigNumber(string n) {
 		sign = 1;
-		for (int i = 0; i < n.size(); i++) {
-			this->chunks.push_back(n[i]);
+		for (int i = n.size()-1; i >=0 ; i--) {
+			this->chunks.push_back(n[i] - '0');
 		}
-		this->N.push_back('0');
+		N = "0";
 	}
 
 	~BigNumber() {}
@@ -470,4 +473,25 @@ std::ostream & operator<<(std::ostream & out, const BigNumber & num)
 
 bool BigNumber::operator != (const BigNumber &num) const {
 	return !(*this == num);
+}
+
+string BigNumber::to_string() const
+{
+	string res;
+	for (int i = chunks.size() - 1; i >= 0; i--) {
+		cout << char(chunks[i] + int('0')) << endl;
+		res.push_back(char(chunks[i] + int('0')));
+	}
+	return res;
+}
+
+
+BigNumber BigNumber::operator%(const BigNumber & num) const
+{
+	BigNumber res = BigNumber("0", N);
+	res.setChunks(chunks);
+	string _N = N;
+	res.setN(num.to_string());
+	res.setN(_N);
+	return res;
 }

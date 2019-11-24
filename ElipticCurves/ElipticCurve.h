@@ -1,6 +1,6 @@
 #pragma once
 #include "Point.h"
-#include "LongOperations.h"
+#include "BigNumber.h"
 #include <limits>
 
 

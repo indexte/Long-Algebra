@@ -1,7 +1,8 @@
 #include <iostream>
 #include "ElipticCurve.h"
-#include "LongOperations.h"
+#include "../1/BigNumber.h"
 #include "Point.h"
+#include "PointExponentiation.h"
 
 using namespace std;
 
@@ -31,5 +32,21 @@ int main() {
 	cout << "Check if point is infinite" << endl;
 	cout << infinitePoint.isInfinitePoint() << endl;
 
-	system("pause");
+    //-----------------------------------------------
+    BigNumber degree = BigNumber("2", curve.getN().to_string());
+    Point aInDegree = exponentiation(curve, a, degree);
+    cout << "Point (13,7) in degree 2: "<< endl;
+    cout << aInDegree.getX() << " " << aInDegree.getY() << endl;
+
+    degree = BigNumber("5", curve.getN().to_string());
+    aInDegree = exponentiation(curve, a, degree);
+    cout << "Point (13,7) in degree 5: "<< endl;
+    cout << aInDegree.getX() << " " << aInDegree.getY() << endl;
+
+    degree = BigNumber("7", curve.getN().to_string());
+    aInDegree = exponentiation(curve, a, degree);
+    cout << "Point (13,7) in degree 7: "<< endl;
+    cout << aInDegree.getX() << " " << aInDegree.getY() << endl;
+
+    return 0;
 }
