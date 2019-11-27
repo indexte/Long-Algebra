@@ -1,5 +1,4 @@
 #pragma once
-#include "pch.h"
 #include <string>
 #include <iostream>
 #include <vector>
@@ -8,6 +7,12 @@ using std::cout;
 using std::endl;
 using std::vector;
 using std::string;
+
+/**
+ * The declaration of the class that is used in functions that factorize BigNumber and return
+ *  the array of dividers and their powers.
+ */
+class factorization;
 
 //division for negaive numb
 int my_div(int num, int diver) {
@@ -58,6 +63,28 @@ public:
 	void _reverse();
 	void _resize(int newsize);
 	void modN(string n);
+
+    /**
+     * This funtion implements tha naive factorization of the number on the prime dividers
+     * @return the structure "factorization" that contains all of the dividers and the proper powers
+     */
+    factorization factorize_naive();
+
+    /**
+     * The actual pollard factorization algo that finds the one and only one divider. It could be
+     *     non-prime.
+     * @param _c the const that is used in function formula. For default user it should equals 1.
+     * @return one of the dividers
+     */
+    BigNumber _factorize_pollard(string _c);
+
+    /**
+     * The "wrap" function for the pollard factorization. It gets the divider from the pollard's algo
+     *      and recursively do it for both divider and the divided/divider. Writes the answer in
+     *      factorization structure.
+     * @return the factorization structure that contains the factual prime factorization
+     */
+    factorization factorize_pollard();
 
 	/*GETTERS SETTERS*/
 	void printBigNumber();
@@ -111,6 +138,67 @@ public:
 	}
 
 	~BigNumber() {}
+};
+
+/**
+ * The initialization of the class that is used in functions that factorize BigNumber and return
+ *  the array of dividers and their powers.
+ */
+class factorization{
+public:
+    vector<BigNumber> base;
+    vector<BigNumber> power;
+
+    /**
+     * This function checks if the number is prime
+     * @return 0 if the number is compositive and 1 if the number is prime
+     */
+    bool is_prime() {
+        vector<int> one;
+        one.push_back(1);
+
+        if (power.size() == 1 && power[0].getChunks() == one) {
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
+     * This functions just prints the factorization data of the structure on the screen
+     */
+    void print(){
+        vector<int> one;
+        one.push_back(1);
+        if(is_prime()){
+            cout << "The number is prime" << endl;
+            return;
+        }
+        cout << "The factorization is:" << endl;
+        for(int i = 0; i < base.size(); i++){
+            cout << "The base: " << base[i] << ". The power: " << power[i] << endl;
+        }
+    }
+
+    /**
+     * This function updates the current data in structure with new data in the same structure
+     * @param in the data that should be added for this structure
+     */
+    void add_factorization(factorization in){
+        bool present = 0;
+        for(int i = 0; i < in.base.size(); i++){
+            for(int j = 0; j < base.size(); j++){
+                if(in.base[i] == base[j]) {
+                    in.power[i] = in.power[i] + power[j];
+                    present = 1;
+                }
+            }
+            if(present == 0){
+                base.push_back(in.base[i]);
+                power.push_back(in.power[i]);
+            }
+            present = 0;
+        }
+    }
 };
 
 // resize vector
@@ -479,7 +567,8 @@ string BigNumber::to_string() const
 {
 	string res;
 	for (int i = chunks.size() - 1; i >= 0; i--) {
-		cout << char(chunks[i] + int('0')) << endl;
+	    // commented the cout cuz I thought it was used only for debugging
+		//cout << char(chunks[i] + int('0')) << endl;            /*********************************
 		res.push_back(char(chunks[i] + int('0')));
 	}
 	return res;
@@ -494,4 +583,207 @@ BigNumber BigNumber::operator%(const BigNumber & num) const
 	res.setN(num.to_string());
 	res.setN(_N);
 	return res;
+}
+/**
+ * This funtion implements tha naive factorization of the number on the prime dividers
+ * @return the structure "factorization" that contains all of the dividers and the proper powers
+ */
+factorization BigNumber::factorize_naive() {
+    vector<BigNumber> _base;
+    vector<BigNumber> _power;
+    factorization out;
+    out.base = _base;
+    out.power = _power;
+
+    BigNumber zero = BigNumber("0", N);
+    BigNumber one = BigNumber("1", N);
+    BigNumber iterator = BigNumber("2", N);
+    BigNumber divided = *this;
+    if(iterator > divided){
+        cout << "This number is less than two. *This cout is used to developers. "
+                "Comment it if u dont need it*" << endl;
+        out.base.push_back(one);
+        out.power.push_back(one);
+        return out;
+    }
+    else {
+        int pos = 0;
+        while(divided >= iterator){
+            if(divided % iterator == zero){
+                out.base.push_back(iterator);
+                out.power.push_back(zero);
+                while(divided % iterator == zero){
+                    if (divided == zero)
+                        return out;
+                    divided = divided / iterator;
+                    out.power[pos] = out.power[pos] + one;
+                }
+                pos++;
+            }
+            iterator = iterator + one;
+        }
+    }
+    return out;
+}
+
+/**
+ * This function is used in Pollard factorization algorithm. Finds the gcd form two numbers.
+ * @param a the first number
+ * @param b the second number
+ * @return the gcd of a and b
+ */
+BigNumber gcd(BigNumber a, BigNumber b){
+    BigNumber zero = BigNumber("0", a.getN());
+
+    if(a == zero)
+        return b;
+    if(b == zero)
+        return a;
+    if(a == b)
+        return a;
+    if(a > b)
+        return gcd(a - b, b);
+    return gcd(a, b - a);
+}
+/**
+ * The actual pollard factorization algo that finds the one and only one divider. It could be
+ *     non-prime.
+ * @param _c the const that is used in function formula. For default user it should equals 1.
+ * @return one of the dividers
+ */
+BigNumber BigNumber::_factorize_pollard(string _c){
+
+    vector<BigNumber> _base;
+    vector<BigNumber> _power;
+    factorization out;
+    out.base = _base;
+    out.power = _power;
+
+    BigNumber zero = BigNumber("0", this->to_string());
+    BigNumber one = BigNumber("1", this->to_string());
+    BigNumber two = BigNumber("2", this->to_string());
+
+    if(two > *this){
+        return zero;
+    }
+
+    out = this->factorize_naive();
+    if(out.is_prime())
+        return one;
+
+    if(_c == "0" || _c == "-2"){
+        cout << "You can not choose 0 or -2 for this algorithm" << endl;
+        return one;
+    }
+
+    BigNumber a = BigNumber("2", "0");
+    BigNumber b = BigNumber("2", "0");
+    BigNumber d = BigNumber("1", this->to_string());
+    BigNumber c = BigNumber(_c, "0");
+    BigNumber b_b = BigNumber("0", "0");
+
+    while(d == one){
+        BigNumber a_a = a * a + c;
+        a = BigNumber(a_a.to_string(), this->to_string());              //
+        b_b = b * b + c;
+        b = BigNumber(b_b.to_string(), this->to_string());
+        b.setN("0");
+        b_b = b * b + c;
+        b = BigNumber(b_b.to_string(), this->to_string());
+
+        if(a > b)
+            d = gcd(a - b, *this);
+        else
+            d = gcd(b - a, *this);
+
+        if(d == *this){
+            cout << "starting doing the algorithm with c = c + 1" << endl;
+            BigNumber temp = c + one;
+            d = _factorize_pollard(temp.to_string());
+        }
+
+        a.setN("0");
+        b.setN("0");
+    }
+    return d;
+}
+/**
+ * The "wrap" function for the pollard factorization. It gets the divider from the pollard's algo
+ *      and recursively do it for both divider and the divided/divider. Writes the answer in
+ *      factorization structure.
+ * @return the factorization structure that contains the factual prime factorization
+ */
+factorization BigNumber::factorize_pollard() {
+    string c = "1";
+
+    vector<BigNumber> _base;
+    vector<BigNumber> _power;
+    factorization out;
+    out.base = _base;
+    out.power = _power;
+
+    vector<BigNumber> _base_temp;
+    vector<BigNumber> _power_temp;
+    factorization temp_out;
+    temp_out.base = _base_temp;
+    temp_out.power = _power_temp;
+
+    BigNumber zero = BigNumber("0", N);
+    BigNumber one = BigNumber("1", N);
+    BigNumber two = BigNumber("2", N);
+    BigNumber divided = *this;
+    if(two > *this){
+        cout << "This number is less than two. *This cout is used to developers. "
+                "Comment it if u dont need it*" << endl;
+        out.base.push_back(one);
+        out.power.push_back(one);
+        return out;
+    }
+    else {
+        //cout << "ya";
+        BigNumber temp = divided._factorize_pollard(c);
+        //cout << "here";
+        temp.setN(N);
+        while(divided % temp == zero && divided > one){
+            bool present = 0;
+            divided = divided / temp;
+            if(temp > one) {
+                temp_out.add_factorization(temp.factorize_pollard());
+                if (temp_out.is_prime()) {
+                    for (int i = 0; i < out.base.size(); i++) {
+                        if (out.base[i] == temp) {
+                            out.power[i] = out.power[i] + one;
+                            present = 1;
+                            break;
+                        }
+                    }
+
+                    if (present == 0) {
+                        out.base.push_back(temp);
+                        out.power.push_back(one);
+                    }
+                    present = 0;
+                } else {
+                    out.add_factorization(temp_out);
+                }
+            }
+            temp = divided._factorize_pollard(c);
+            temp.setN(N);
+            if(temp == one) {
+                for(int i = 0; i < out.base.size(); i++){
+                    if(out.base[i] == divided) {
+                        out.power[i] = out.power[i] + one;
+                        present = 1;
+                    }
+                }
+                if(present == 0){
+                    out.base.push_back(divided);
+                    out.power.push_back(one);
+                }
+                return out;
+            }
+            present = 0;
+        }
+    }
+    return out;
 }
