@@ -1,5 +1,4 @@
 #pragma once
-#include "pch.h"
 #include <string>
 #include <iostream>
 #include <vector>
@@ -9,7 +8,7 @@ using std::endl;
 using std::vector;
 using std::string;
 
-//division for negaive numb
+//division for negative number
 int my_div(int num, int diver) {
 	if ((num < 0) && (num % diver))
 		return num / diver - 1;
@@ -17,7 +16,7 @@ int my_div(int num, int diver) {
 		return num / diver;
 }
 
-//mod for negaive numb
+//mod for negative number
 int my_mod(int num, int diver) {
 	if ((num < 0) && (num % diver))
 		return num % diver + diver;
@@ -50,6 +49,7 @@ public:
 	BigNumber operator + (const BigNumber &num) const;
 	BigNumber operator - (const BigNumber &num) const;
 	BigNumber operator * (const BigNumber &num) const;
+	BigNumber operator ^ (const BigNumber& num) const;
 	BigNumber inverse() const;
 	BigNumber operator/(const BigNumber & num) const;
 	bool operator!=(const BigNumber & num) const;
@@ -58,6 +58,9 @@ public:
 	void _reverse();
 	void _resize(int newsize);
 	void modN(string n);
+
+
+	static void montgomery_mult(const BigNumber& num1, const BigNumber& num2);
 
 	/*GETTERS SETTERS*/
 	void printBigNumber();
@@ -112,6 +115,12 @@ public:
 
 	~BigNumber() {}
 };
+
+//num1 and num2 are numbers in montogomery form (!!!!)
+void BigNumber::montgomery_mult(const BigNumber& num1, const BigNumber& num2) {
+	
+}
+
 
 // resize vector
 void BigNumber::_resize(int newSize) {
@@ -398,6 +407,33 @@ BigNumber BigNumber::operator - (const BigNumber &num) const {
 	return res;
 }
 
+BigNumber BigNumber::operator ^ (const BigNumber& pow) const {
+	//x^pow % N
+	BigNumber one("1");
+	if (pow == one)
+		return *this;
+	if (pow == BigNumber("0"))
+		return one;
+
+	BigNumber res = *this;
+	BigNumber two("2");
+
+	BigNumber i("1");
+
+
+
+	for (; pow > i*two;) {
+		res = res * res;
+		i = i * two;
+	}
+
+	while (i != pow) {
+		res = res * *this;
+		i = i + one;
+	}
+	
+	return res;
+}
 
 // operator *
 BigNumber BigNumber::operator * (const BigNumber &num) const {
