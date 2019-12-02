@@ -115,10 +115,12 @@ public:
 		modN(N);
 	};
 
-	int getBASE() { return this->BASE; }
-	string getN() { return this->N; }
-	int getSign() { return this->sign; }
-	vector<int> getChunks() { return this->chunks; }
+	int getBASE() const { return this->BASE; }
+	string getN() const { return this->N; }
+	int getSign() const { return this->sign; }
+	vector<int> getChunks() const { return this->chunks; }
+	void decrease(const BigNumber& a, BigNumber& b, const BigNumber& a_count_in_a, BigNumber& a_count_in_b) const;
+	BigNumber simple_division(const BigNumber& b) const;
 
 	/*CREATION*/
 	BigNumber(string str, string n) {
@@ -300,6 +302,62 @@ void  BigNumber::modN(string N) {
 }
 //*/
 
+
+//for faster division
+void BigNumber::decrease(const BigNumber & a, BigNumber & b, const BigNumber& a_count_in_a, BigNumber& a_count_in_b) const
+{
+	if (b.getN() == "0") {
+		string N = a.getN();
+	}
+	else {
+		string N = b.getN();
+	}
+	BigNumber one("1");
+	BigNumber ten("10");
+	BigNumber modifier("0");
+	BigNumber count("0");
+	for (int i = b.getChunks().size() - 1; i >= 0; i--) {
+		count = count * ten;
+		modifier = modifier * ten;
+		modifier = modifier + BigNumber(std::to_string(b.getChunks()[i]));
+		while (modifier >= a) {
+			modifier = modifier - a;
+			count = count + one;
+		}
+	}
+	modifier.setN(N);
+	count.setN(N);
+	b = modifier;
+	a_count_in_b = a_count_in_b - count * a_count_in_a;
+}
+//
+//division not under field
+BigNumber BigNumber::simple_division(const BigNumber & b) const
+{
+	BigNumber res("0");
+	vector<int> reschunks;
+	BigNumber ten("10");
+	BigNumber temp("0");
+	for (int i = chunks.size() - 1; i >= 0;) {
+		while (b > temp && i >= 0) {
+			temp = temp * ten + BigNumber(std::to_string(chunks[i]));
+			i--;
+		}
+		int count = 0;
+		while (temp >= b) {
+			temp = temp - b;
+			count++;
+		}
+		cout << count << endl;
+		reschunks.push_back(count);
+	}
+	if (!reschunks.empty()) {
+		res.setChunks(reschunks);
+	}
+	res._reverse();
+	return res;
+}
+//
 // operator > 
 bool BigNumber::operator > (const BigNumber &num) const {
 	if (sign > num.sign) {
@@ -557,24 +615,24 @@ BigNumber BigNumber::inverse() const {
 	BigNumber one("1", N);
 	BigNumber zero("0", N);
 	BigNumber a_1("1", N);//a count in a
-	BigNumber a_2("0", N);//b count in a
+	//BigNumber a_2("0", N);//b count in a
 	BigNumber b_1("0", N);//a count in b
-	BigNumber b_2("1", N);//b count in b
+	//BigNumber b_2("1", N);//b count in b
 	BigNumber x("0", N);//result
-	while (a != one && b != one) {
+	while (!(a == one) && !(b == one)) {
 		if ((a == zero) || (b == zero)) {
 			return zero;
 		}
 		if (a >= b) {
-			a = a - b;
-			a_1 = a_1 - b_1;
-			a_2 = a_2 - b_2;
+			decrease(b, a, b_1, a_1);
+			//a_1 = a_1 - b_1;
+			//a_2 = a_2 - b_2;
 		}
 		else
 		{
-			b = b - a;
-			b_1 = b_1 - a_1;
-			b_2 = b_2 - a_2;
+			decrease(a, b, a_1, b_1);
+			//b_1 = b_1 - a_1;
+			//b_2 = b_2 - a_2;
 		}
 	}
 	if (a == one) {
@@ -587,11 +645,15 @@ BigNumber BigNumber::inverse() const {
 	return x;
 }
 
-// operator /
+// operator /(if one of module==0 do standart division)
 BigNumber BigNumber::operator / (const BigNumber &num) const {
-
-	BigNumber res = (*this)*(num.inverse());
-
+	BigNumber res("0");
+	if (this->getN() != "0"&&num.getN() != "0") {
+		 res = (*this)*(num.inverse());
+	}
+	else {
+		 res = simple_division(num);
+	}
 	return res;
 }
 
