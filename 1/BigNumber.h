@@ -11,14 +11,14 @@ using std::vector;
 using std::string;
 
 /**
- * ¹3
+ * #3
  * The declaration of the class that is used in functions that factorize BigNumber and return
  * the array of dividers and their powers.
  */
 class factorization;
 
 /**
- * ¹1
+ * #1
  * division for negaive numb
  */
 int my_div(int num, int diver) {
@@ -29,7 +29,7 @@ int my_div(int num, int diver) {
 }
 
 /**
- * ¹1
+ * #1
  * mod for negative number
  */
 int my_mod(int num, int diver) {
@@ -127,7 +127,7 @@ public:
 
 	/*OPERATIONS*/
 
-	/* ¹1 */
+	/* #1 */
 	BigNumber operator - () const;
 	void operator = (const BigNumber &num);
 	bool operator == (const BigNumber &num) const;
@@ -141,20 +141,20 @@ public:
 	BigNumber operator / (const BigNumber & num) const;
 	BigNumber inverse() const;
 
-	/* ¹2 */
+	/* #2 */
 	BigNumber operator ^ (const BigNumber& num) const;
 
-	/* ¹3 */
+	/* #3 */
 
 	/**
-	 * ¹3
+	 * #3
 	 * This funtion implements tha naive factorization of the number on the prime dividers
 	 * @return the structure "factorization" that contains all of the dividers and the proper powers
 	 */
 	factorization factorize_naive();
 
 	/**
-	 * ¹3
+	 * #3
 	 * The actual pollard factorization algo that finds the one and only one divider. It could be
 	 *     non-prime.
 	 * @param _c the const that is used in function formula. For default user it should equals 1.
@@ -163,7 +163,7 @@ public:
 	BigNumber _factorize_pollard(string _c);
 
 	/**
-	 * ¹3
+	 * #3
 	 * The "wrap" function for the pollard factorization. It gets the divider from the pollard's algo
 	 *      and recursively do it for both divider and the divided/divider. Writes the answer in
 	 *      factorization structure.
@@ -174,50 +174,50 @@ public:
 	BigNumber log_pollard(const BigNumber& alpha, const BigNumber& beta);
 
 
-	/* ¹4 */
+	/* #4 */
 
 	int Jacobi();
 	// square root
 	vector<BigNumber> Euclidean_algorithm();
 
-	/* ¹5 */
+	/* #5 */
 
 
-	/* ¹6 */
+	/* #6 */
 
 
-	/* ¹7 */
+	/* #7 */
 
 
-	/* ¹8 */
+	/* #8 */
 
 
-	/* ¹9 */
+	/* #9 */
 
 
-	/* ¹10 */
+	/* #10 */
 
 
 	/**
-	 * ¹
+	 * #
 	 * !!!!!!!!!!!!!!!!
 	 */
 	void set(BigNumber &x, BigNumber &a, BigNumber &b);
 
 	/**
-	 * ¹
+	 * #
 	 * !!!!!!!!!!!!!!!!
 	 */
 	void decrease(const BigNumber& a, BigNumber& b, const BigNumber& a_count_in_a, BigNumber& a_count_in_b) const;
 	/**
-	 * ¹
+	 * #
 	 * !!!!!!!!!!!!!!!!
 	 */
 	BigNumber simple_division(const BigNumber& b) const;
 };
 
 /**
- * ¹3
+ * #3
  * The initialization of the class that is used in functions that factorize BigNumber and return
  *  the array of dividers and their powers.
  */
@@ -227,7 +227,7 @@ public:
 	vector<BigNumber> power;
 
 	/**
-	 * ¹3
+	 * #3
 	 * This function checks if the number is prime
 	 * @return 0 if the number is compositive and 1 if the number is prime
 	 */
@@ -242,7 +242,7 @@ public:
 	}
 
 	/**
-	 * ¹3
+	 * #3
 	 * This functions just prints the factorization data of the structure on the screen
 	 */
 	void print() {
@@ -259,7 +259,7 @@ public:
 	}
 
 	/**
-	 * ¹3
+	 * #3
 	 * This function updates the current data in structure with new data in the same structure
 	 * @param in the data that should be added for this structure
 	 */
@@ -413,10 +413,10 @@ bool BigNumber::operator != (const BigNumber &num) const {
 	return !(*this == num);
 }
 
-/* ¹1 */
+/* #1 */
 
 /**
- * ¹1
+ * #1
  * @brief (mod N)
  * (helper in modN())
  */
@@ -429,7 +429,7 @@ void  BigNumber::_modN(BigNumber N_) {
 }
 
 /**
- * ¹1
+ * #1
  * @brief (mod N)
  */
 void  BigNumber::modN(string N) {
@@ -464,7 +464,7 @@ void  BigNumber::modN(string N) {
 }
 
 /**
- * ¹1
+ * #1
  * @brief division
  * @details for faster division
  * (used in inverse())
@@ -497,7 +497,7 @@ void BigNumber::decrease(const BigNumber & a, BigNumber & b, const BigNumber& a_
 }
 
 /**
- * ¹1
+ * #1
  * @brief division not under field
  * (used in division /)
  */
@@ -528,7 +528,7 @@ BigNumber BigNumber::simple_division(const BigNumber & b) const
 }
 
 /**
- * ¹1
+ * #1
  * @brief operator +
  */
 BigNumber BigNumber::operator + (const BigNumber &num) const {
@@ -597,7 +597,7 @@ BigNumber BigNumber::operator + (const BigNumber &num) const {
 }
 
 /**
- * ¹1
+ * #1
  * @brief operator -
  */
 BigNumber BigNumber::operator - (const BigNumber &num) const {
@@ -663,7 +663,7 @@ BigNumber BigNumber::operator - (const BigNumber &num) const {
 }
 
 /**
- * ¹1
+ * #1
  * @brief operator *
  */
 BigNumber BigNumber::operator * (const BigNumber &num) const {
@@ -686,7 +686,7 @@ BigNumber BigNumber::operator * (const BigNumber &num) const {
 }
 
 /**
- * ¹1
+ * #1
  * @brief inversed element to big number
  * @details returns 0 if greatest common dividor !=1
  */
@@ -722,7 +722,7 @@ BigNumber BigNumber::inverse() const {
 }
 
 /**
- * ¹1
+ * #1
  * @brief operator /
  * if one of module == 0 do standart division
  */
@@ -738,7 +738,7 @@ BigNumber BigNumber::operator / (const BigNumber &num) const {
 }
 
 /**
- * ¹1
+ * #1
  * @brief operator %
  */
 BigNumber BigNumber::operator % (const BigNumber & num) const
@@ -751,10 +751,10 @@ BigNumber BigNumber::operator % (const BigNumber & num) const
 	return res;
 }
 
-/* ¹2 */
+/* #2 */
 
 /**
- * ¹2
+ * #2
  * @brief operator ^
  */
 BigNumber BigNumber::operator ^ (const BigNumber& pow) const {
@@ -783,10 +783,10 @@ BigNumber BigNumber::operator ^ (const BigNumber& pow) const {
 	return res;
 }
 
-/* ¹3 */
+/* #3 */
 
 /**
- * ¹3
+ * #3
  * This funtion implements tha naive factorization of the number on the prime dividers
  * @return the structure "factorization" that contains all of the dividers and the proper powers
  */
@@ -829,7 +829,7 @@ factorization BigNumber::factorize_naive() {
 }
 
 /**
- * ¹3
+ * #3
  * This function is used in Pollard factorization algorithm. Finds the gcd form two numbers.
  * @param a the first number
  * @param b the second number
@@ -850,7 +850,7 @@ BigNumber gcd(BigNumber a, BigNumber b) {
 }
 
 /**
- * ¹3
+ * #3
  * The actual pollard factorization algo that finds the one and only one divider. It could be
  *     non-prime.
  * @param _c the const that is used in function formula. For default user it should equals 1.
@@ -914,7 +914,7 @@ BigNumber BigNumber::_factorize_pollard(string _c) {
 }
 
 /**
- * ¹3
+ * #3
  * The "wrap" function for the pollard factorization. It gets the divider from the pollard's algo
  *      and recursively do it for both divider and the divided/divider. Writes the answer in
  *      factorization structure.
@@ -996,10 +996,10 @@ factorization BigNumber::factorize_pollard() {
 	return out;
 }
 
-/* ¹4 */
+/* #4 */
 
 /**
- * ¹4
+ * #4
  * @brief
  * @return
  */
@@ -1048,7 +1048,7 @@ int BigNumber::Jacobi()
 }
 
 /**
- * ¹4
+ * #4
  * @brief
  * @return
  */
@@ -1099,26 +1099,26 @@ vector<BigNumber> BigNumber::Euclidean_algorithm(BigNumber a, BigNumber b)
 }
 
 
-/* ¹5 */
+/* #5 */
 
 
-/* ¹6 */
+/* #6 */
 
 
-/* ¹7 */
+/* #7 */
 
 
-/* ¹8 */
+/* #8 */
 
 
-/* ¹9 */
+/* #9 */
 
 
-/* ¹10 */
+/* #10 */
 
 
 /**
- * ¹
+ * #
  * @brief !!!!!!!!!!!!!!
  */
 void BigNumber::set(BigNumber &x, BigNumber &a, BigNumber &b)
@@ -1155,7 +1155,7 @@ void BigNumber::set(BigNumber &x, BigNumber &a, BigNumber &b)
 }
 
 /**
- * ¹
+ * #
  * @brief !!!!!!!!!!!!!!
  */
 BigNumber BigNumber::log_pollard(const BigNumber& alpha, const BigNumber& beta)
