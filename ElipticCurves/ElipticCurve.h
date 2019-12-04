@@ -174,6 +174,8 @@ bool ElipticCurve::isPointOnCurve(Point a) {
 *This function is created to allow users pass points without setting N to their coordinates.
 */
 Point ElipticCurve::getPointWithN(Point point) {
+	if (point.isInfinitePoint())
+		return Point::getInfinitePoint();
 	BigNumber x = point.getX();
 	x.setN(N.to_string());
 	BigNumber y = point.getY();
