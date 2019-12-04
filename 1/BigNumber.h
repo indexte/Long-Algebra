@@ -339,17 +339,6 @@ string BigNumber::to_string() const
 	return res;
 }
 
-// print BigNumber
-void BigNumber::printBigNumber() {
-	if (sign == -1) {
-		cout << '-';
-	}
-	for (int i = chunks.size() - 1; i >= 0; i--) {
-		cout << chunks[i];
-	}
-	cout << endl;
-}
-
 // operator > 
 bool BigNumber::operator > (const BigNumber &num) const {
 	if (sign > num.sign) {
