@@ -189,7 +189,7 @@ public:
 	 * @param take 2 numbers a, b
 	 * @return vector {d, x, y} such that ax + by = d, where d = GCD(a, b)
 	 */ 
-	 vector<BigNumber> Euclidean_algorithm();
+	 vector<BigNumber> Euclidean_algorithm(BigNumber a, BigNumber b);
 
 	 /**
 	 * #4
