@@ -1,5 +1,5 @@
 #pragma once
-#include "../1/BigNumber.h"
+#include "../BigNumber/BigNumber.h"
 
 class Point {
 private:

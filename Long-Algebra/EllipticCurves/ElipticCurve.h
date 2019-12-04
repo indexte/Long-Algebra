@@ -1,6 +1,6 @@
 #pragma once
 #include "Point.h"
-#include "../1/BigNumber.h"
+#include "../BigNumber/BigNumber.h"
 #include <limits>
 
 
