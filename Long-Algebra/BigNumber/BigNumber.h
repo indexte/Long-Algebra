@@ -206,7 +206,15 @@ public:
 	/* #6 */
 
 
-	/* #7 */
+	/**
+	* #7
+	* @brief Determining the order of a group element
+	* @return order of a multiplicative group element
+	* return 0 otherwise
+	*/
+
+	BigNumber elementOrder(BigNumber A, BigNumber S);
+
 
 
 	/* #8 */
@@ -1179,7 +1187,35 @@ vector<BigNumber> BigNumber::sqrt()
 /* #6 */
 
 
-/* #7 */
+/**
+* #7
+* @brief Determining the order of a group element
+* @return order of a multiplicative group element
+* return 0 otherwise
+*/
+inline BigNumber BigNumber::elementOrder(BigNumber A, BigNumber S)
+{
+	BigNumber one("1", A.getN());
+	BigNumber zero("0", A.getN());
+
+	if (gcd(A, S) != one)
+		return zero;
+
+	BigNumber result("1", A.getN());
+
+	BigNumber K("1", A.getN());
+	while (S > K)
+	{
+		result = (result * A) % S;
+
+		if (result == K)
+			return K;
+
+		K + one;
+	}
+
+	return zero;
+}
 
 
 /* #8 */
