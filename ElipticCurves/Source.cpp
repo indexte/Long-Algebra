@@ -1,6 +1,6 @@
 #include <iostream>
-#include "ElipticCurve.h"
 #include "../1/BigNumber.h"
+#include "ElipticCurve.h"
 #include "Point.h"
 #include "PointExponentiation.h"
 
@@ -34,18 +34,32 @@ int main() {
 
     //-----------------------------------------------
     BigNumber degree = BigNumber("2", curve.getN().to_string());
-    Point aInDegree = exponentiation(curve, a, degree);
+    Point aInDegree = curve.exponentiation(a, degree);
     cout << "Point (13,7) in degree 2: "<< endl;
     cout << aInDegree.getX() << " " << aInDegree.getY() << endl;
 
     degree = BigNumber("5", curve.getN().to_string());
-    aInDegree = exponentiation(curve, a, degree);
+    aInDegree = curve.exponentiation(a, degree);
     cout << "Point (13,7) in degree 5: "<< endl;
     cout << aInDegree.getX() << " " << aInDegree.getY() << endl;
 
     degree = BigNumber("7", curve.getN().to_string());
-    aInDegree = exponentiation(curve, a, degree);
+    aInDegree = curve.exponentiation(a, degree);
     cout << "Point (13,7) in degree 7: "<< endl;
+    cout << aInDegree.getX() << " " << aInDegree.getY() << endl;
+
+    curve = ElipticCurve(BigNumber("3"), BigNumber("5"), BigNumber("7"));
+    a = Point(BigNumber("6"), BigNumber("6"));
+    degree = BigNumber("20", curve.getN().to_string());
+    aInDegree = curve.exponentiation(a, degree);
+    cout << "Point (6,6) in degree 20: "<< endl;
+    cout << aInDegree.getX() << " " << aInDegree.getY() << endl;
+
+    curve = ElipticCurve(BigNumber("234"), BigNumber("464"), BigNumber("109"));
+    a = Point(BigNumber("77"), BigNumber("50"));
+    degree = BigNumber("44", curve.getN().to_string());
+    aInDegree = curve.exponentiation(a, degree);
+    cout << "Point (77,50) in degree 44: "<< endl;
     cout << aInDegree.getX() << " " << aInDegree.getY() << endl;
 
     return 0;

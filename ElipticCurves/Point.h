@@ -14,11 +14,11 @@ public:
 		return point;
 	}
 
-	Point(BigNumber x, BigNumber y) :x(x), y(y) {
+	Point(BigNumber x, BigNumber y) :x(x), y(y), isInfinite(false) {
 
 	}
 
-	Point(string x, string y) :x(BigNumber(x)), y(BigNumber(y))
+	Point(string x, string y) :x(BigNumber(x)), y(BigNumber(y)), isInfinite(false)
 	{
 
 	}
