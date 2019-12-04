@@ -1,6 +1,6 @@
 #pragma once
 #include "Point.h"
-#include "BigNumber.h"
+#include "../1/BigNumber.h"
 #include <limits>
 
 
@@ -22,6 +22,9 @@ public:
 			throw new std::invalid_argument("Discriminant cannot be equal 0");
 		}
 	}
+	Point getNewPointForOrderFinding(BigNumber* currX);
+	BigNumber getOrderOfGroup();
+	vector<BigNumber*> getDividers(BigNumber& lcm);
 
 	BigNumber getA();
 	BigNumber getB();
@@ -43,6 +46,54 @@ BigNumber ElipticCurve::getA() {
 
 BigNumber ElipticCurve::getN() {
 	return N;
+}
+
+// Returns order of a group
+BigNumber ElipticCurve::getOrderOfGroup()
+{
+	bool orderFound = false;
+	// line 5 initiallized and used 17 line variable in this algorithm
+	// https://en.wikipedia.org/wiki/Counting_points_on_elliptic_curves#Baby-step_giant-step
+	BigNumber L("1");
+	BigNumber one("1");
+	BigNumber currPointOrder("1");
+	Point currPoint("0", "0");
+	BigNumber currX("0");
+	while (!orderFound)
+	{
+		currPoint = getNewPointForOrderFinding(&currX);
+		//L = lcm(L, getPointOrder(currPoint));
+		vector<BigNumber*> dividers = getDividers(L);
+		if (dividers.size() <= 1)
+		{
+			orderFound = true;
+			if (dividers.size() == 1)
+				return *dividers[0];
+			else
+			{
+				cout << endl << "Error while counting group order" << endl;
+				return BigNumber("0");
+			}
+		}
+		currX = currX + one;
+	}
+}
+
+vector<BigNumber*> ElipticCurve::getDividers(BigNumber& lcm)
+{
+	return vector<BigNumber*>();
+}
+
+Point ElipticCurve::getNewPointForOrderFinding(BigNumber* currX)
+{
+	BigNumber one("1");
+	while (true)
+	{
+		BigNumber Sqrt("0"); //= sqr(currX*currX*currX+A*currX+B);
+		if (Sqrt != BigNumber("-1"))
+			return Point(*currX, Sqrt);
+		*currX = *currX + one;
+	}
 }
 
 /**

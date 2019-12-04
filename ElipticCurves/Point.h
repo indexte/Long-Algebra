@@ -1,5 +1,5 @@
 #pragma once
-#include "BigNumber.h"
+#include "../1/BigNumber.h"
 
 class Point {
 private:
@@ -15,6 +15,11 @@ public:
 	}
 
 	Point(BigNumber x, BigNumber y) :x(x), y(y) {
+
+	}
+
+	Point(string x, string y) :x(BigNumber(x)), y(BigNumber(y))
+	{
 
 	}
 
