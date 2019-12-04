@@ -176,9 +176,29 @@ public:
 
 	/* #4 */
 
+	/**
+	 * #4
+	 * @brief check if the number is a quadratic residue modulo N
+	 * @return 1 if it is and return -1 otherwise
+	 */
 	int Jacobi();
-	// square root
-	vector<BigNumber> Euclidean_algorithm();
+	
+	 /**
+	 * #4
+	 * @brief Euclidean algorithm
+	 * @param take 2 numbers a, b
+	 * @return vector {d, x, y} such that ax + by = d, where d = GCD(a, b)
+	 */ 
+	 vector<BigNumber> Euclidean_algorithm();
+
+	 /**
+	 * #4
+	 * @brief square root
+	 * @return square roots if the number has it and N is a prime number
+	 * return empty vector otherwise
+	 */
+	 vector<BigNumber> sqrt(); // 
+	
 
 	/* #5 */
 
@@ -999,9 +1019,60 @@ factorization BigNumber::factorize_pollard() {
 /* #4 */
 
 /**
+* #4
+* @brief Euclidean algorithm
+* @param take 2 numbers a, b
+* @return vector {d, x, y} such that ax + by = d, where d = GCD(a, b)
+*/
+vector<BigNumber> BigNumber::Euclidean_algorithm(BigNumber a, BigNumber b)
+{
+	vector<BigNumber> answer;
+	answer.push_back(BigNumber("0"));
+	answer.push_back(BigNumber("0"));
+	answer.push_back(BigNumber("0"));
+	if (b > a)
+	{
+		BigNumber pocket = a;
+		a = b;
+		b = pocket;
+	}
+	if (b == BigNumber("0"))
+	{
+		answer[0] = a;
+		answer[1] = BigNumber("1");
+		answer[2] = BigNumber("0");
+		return answer;
+	}
+	BigNumber x2 = BigNumber("1"), x1 = BigNumber("0"),
+		y2 = BigNumber("0"), y1 = BigNumber("1");
+	b.setN("0");
+	while (b >= BigNumber("1"))
+	{
+		BigNumber q("0");
+		BigNumber copy = a;
+		while (copy >= b)
+		{
+			copy = copy - b;
+			q = q + BigNumber("1");
+		}
+		BigNumber r = a - q * b;
+		answer[1] = x2 - q * x1;
+		answer[2] = y2 - q * y1;
+		a = b;
+		b = r;
+		x2 = x1;
+		x1 = answer[1];
+		y2 = y1;
+		y1 = answer[2];
+	}
+	answer[0] = a; answer[1] = x2; answer[2] = y2;
+	return answer;
+}
+
+/**
  * #4
- * @brief
- * @return
+ * @brief check if the number is a quadratic residue modulo N
+ * @return 1 if it is and return -1 otherwise
  */
 int BigNumber::Jacobi()
 {
@@ -1048,56 +1119,70 @@ int BigNumber::Jacobi()
 }
 
 /**
- * #4
- * @brief
- * @return
- */
-*
-vector<BigNumber> BigNumber::Euclidean_algorithm(BigNumber a, BigNumber b)
+* #4
+* @brief square root
+* @return square roots if the number has it and N is a prime number
+* return empty vector otherwise
+*/
+vector<BigNumber> BigNumber::sqrt()
 {
-	vector<BigNumber> answer;
-	answer.push_back(BigNumber("0"));
-	answer.push_back(BigNumber("0"));
-	answer.push_back(BigNumber("0"));
-	if (b > a)
+	BigNumber P(N, N + "1");
+	factorization factor = P.factorize_pollard();
+	if (factor.is_prime())
 	{
-		BigNumber pocket = a;
-		a = b;
-		b = pocket;
-	}
-	if (b == BigNumber("0"))
-	{
-		answer[0] = a;
-		answer[1] = BigNumber("1");
-		answer[2] = BigNumber("0");
-		return answer;
-	}
-	BigNumber x2 = BigNumber("1"), x1 = BigNumber("0"),
-		y2 = BigNumber("0"), y1 = BigNumber("1");
-	b.setN("0");
-	while (b >= BigNumber("1"))
-	{
-		BigNumber q("0");
-		BigNumber copy = a;
-		while (copy >= b)
+		if (Jacobi() == -1) return {};
+		BigNumber b("0");
+		for (BigNumber i = BigNumber("1", N); BigNumber(N, "0") - BigNumber("1", "0") > i; i = i + BigNumber("1", "0"))
 		{
-			copy = copy - b;
-			q = q + BigNumber("1");
+			if (i.Jacobi() == -1)
+			{
+				b.setBigNumber(i);
+				break;
+			}
 		}
-		BigNumber r = a - q * b;
-		answer[1] = x2 - q * x1;
-		answer[2] = y2 - q * y1;
-		a = b;
-		b = r;
-		x2 = x1;
-		x1 = answer[1];
-		y2 = y1;
-		y1 = answer[2];
-	}
-	answer[0] = a; answer[1] = x2; answer[2] = y2;
-	return answer;
-}
 
+
+		BigNumber t = BigNumber(N) - BigNumber("1");
+		BigNumber s("0", "0");
+
+		while (t.getChunks()[0] % 2 == 0 || (t.getChunks().size() == 1 && t.getChunks()[0] % 2 == 0))
+		{
+			BigNumber copy_1("0", t.getN());
+			while (t != BigNumber("0", t.getN()))
+			{
+				copy_1 = copy_1 + BigNumber("1", "0");
+				t = t - BigNumber("2", "0");
+			}
+			t = copy_1;
+			s = s + BigNumber("1", "0");
+		}
+		BigNumber inv = inverse();
+		BigNumber c = b ^ t;
+		BigNumber r = *this;
+		BigNumber new_number = t + BigNumber("1");
+		if (new_number.getChunks()[0] % 2 == 0) {
+			BigNumber copy_1("0", new_number.getN());
+			while (new_number != BigNumber("0", new_number.getN()))
+			{
+				copy_1 = copy_1 + BigNumber("1", "0");
+				new_number = new_number - BigNumber("2", "0");
+			}
+			new_number = copy_1;
+		}
+		r = r ^ new_number;
+		for (BigNumber i = BigNumber("1", "0"); s >= i + BigNumber("1", "0"); i = i + BigNumber("1", "0"))
+		{
+			BigNumber d = (r*r*inv) ^ (BigNumber("2") ^ (s - i - BigNumber("1")));
+			if (d == BigNumber(N) - BigNumber("1"))
+			{
+				r = r * c;
+			}
+			c = c * c;
+		}
+		return { r, -r };
+	}
+	return {};
+}
 
 /* #5 */
 
