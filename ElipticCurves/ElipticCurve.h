@@ -10,7 +10,7 @@ private:
 	BigNumber B;
 	BigNumber N;
 
-	Point getPointWithN(Point point);
+	Point getPointWithN(Point    point);
 public:
 	ElipticCurve(BigNumber A, BigNumber B, BigNumber N):A(A),B(B),N(N) {
 		//set N in case user haven't done it
@@ -25,6 +25,7 @@ public:
 	Point getNewPointForOrderFinding(BigNumber* currX);
 	BigNumber getOrderOfGroup();
 	vector<BigNumber*> getDividers(BigNumber& lcm);
+    Point exponentiation (Point a, BigNumber& k); //Point A in degree k
 
 	BigNumber getA();
 	BigNumber getB();
@@ -174,9 +175,40 @@ bool ElipticCurve::isPointOnCurve(Point a) {
 *This function is created to allow users pass points without setting N to their coordinates.
 */
 Point ElipticCurve::getPointWithN(Point point) {
+    if (point.isInfinitePoint())
+        return Point::getInfinitePoint();
 	BigNumber x = point.getX();
 	x.setN(N.to_string());
 	BigNumber y = point.getY();
 	y.setN(N.to_string());
 	return Point(x, y);
+}
+
+/**
+ * #16
+ * @brief Point on the elliptic curve exponentiation implemented in this function
+ * @return new Point on this curve (or infinite point)
+ */
+Point ElipticCurve::exponentiation (Point a, BigNumber& k) { //Point A in degree k
+
+    if (!(k >= BigNumber("0", k.getN()))) {
+        throw std::invalid_argument("Degree cannot be 0 or lower");
+    }
+
+    //k = k % (A point order);
+    if (k == BigNumber("0")) {return Point::getInfinitePoint();}
+
+    Point b = Point::getInfinitePoint();
+
+    while (k != BigNumber("0", k.getN())) {
+        if (k % BigNumber("2",k.getN()) == BigNumber("0", k.getN())) {
+            k = k / BigNumber("2",k.getN());
+            a = addPoints(a,a);
+        } else {
+            k = k - BigNumber("1",k.getN());
+            b = addPoints(b,a);
+        }
+    }
+
+    return b;
 }
