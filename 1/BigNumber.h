@@ -1,9 +1,7 @@
-#include "BigNumber.h"
-
-#include <string>
 #include <iostream>
-#include <vector>
 #include <cmath>
+#include <string>
+#include <vector>
 
 using std::cout;
 using std::endl;
